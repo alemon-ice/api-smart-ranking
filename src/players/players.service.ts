@@ -38,6 +38,16 @@ export class PlayersService {
     return player;
   }
 
+  async deletePlayer(email: string): Promise<Player> {
+    const player = await this.getPlayerByEmail(email);
+
+    this.players = this.players.filter(
+      (playerItem) => playerItem.email !== player.email,
+    );
+
+    return player;
+  }
+
   private async create(createPlayerDto: CreatePlayerDto): Promise<Player> {
     const { name, email, phoneNumber } = createPlayerDto;
 
@@ -51,7 +61,6 @@ export class PlayersService {
       imageUrl: 'https://avatars.githubusercontent.com/u/43359988?v=4',
     };
 
-    this.logger.log(`PlayerDTO: ${JSON.stringify(player)}`);
     this.players.push(player);
 
     return player;

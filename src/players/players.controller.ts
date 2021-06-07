@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { CreatePlayerDto } from './dtos/create-player.dto';
 import { PlayersService } from './players.service';
 
@@ -34,5 +34,15 @@ export class PlayersController {
     }
 
     return JSON.stringify(response);
+  }
+
+  @Delete()
+  async deletePlayer(@Query('email') email: string) {
+    const player = await this.playersService.deletePlayer(email);
+
+    return JSON.stringify({
+      message: 'Jogador deletado com sucesso',
+      data: player,
+    });
   }
 }
