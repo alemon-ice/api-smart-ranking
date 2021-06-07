@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePlayerDto } from './dtos/create-player.dto';
 import { Player } from './interfaces/player.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,11 +8,37 @@ export class PlayersService {
   private readonly logger = new Logger(PlayersService.name);
   private players: Player[] = [];
 
-  async createOrUpdatePlayer(createPlayerDto: CreatePlayerDto): Promise<void> {
-    this.create(createPlayerDto);
+  async createOrUpdatePlayer(
+    createPlayerDto: CreatePlayerDto,
+  ): Promise<Player> {
+    const { email } = createPlayerDto;
+
+    const playerExist = this.players.find((player) => player.email === email);
+
+    if (playerExist) {
+      return await this.update(playerExist, createPlayerDto);
+    } else {
+      return await this.create(createPlayerDto);
+    }
   }
 
-  private create(createPlayerDto: CreatePlayerDto): void {
+  async getAllPlayers(): Promise<Player[]> {
+    return this.players;
+  }
+
+  async getPlayerByEmail(email: string): Promise<Player> {
+    const player = this.players.find((player) => player.email === email);
+
+    if (!player) {
+      throw new NotFoundException(
+        `Jogador com e-mail ${email} não encontrado!`,
+      );
+    }
+
+    return player;
+  }
+
+  private async create(createPlayerDto: CreatePlayerDto): Promise<Player> {
     const { name, email, phoneNumber } = createPlayerDto;
 
     const player: Player = {
@@ -27,5 +53,16 @@ export class PlayersService {
 
     this.logger.log(`PlayerDTO: ${JSON.stringify(player)}`);
     this.players.push(player);
+
+    return player;
+  }
+
+  private async update(
+    playerExist: Player,
+    updatePlayerDto: CreatePlayerDto,
+  ): Promise<Player> {
+    playerExist.name = updatePlayerDto.name;
+
+    return playerExist;
   }
 }
