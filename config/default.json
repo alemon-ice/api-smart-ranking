@@ -1,0 +1,7 @@
+{
+  "App": {
+    "database": {
+      "mongoURL": "mongodb://localhost:27028/smart-ranking"
+    }
+  }
+}
