@@ -39,7 +39,7 @@ export class PlayersService {
     const playerExist = await this.playerModel.findOne({ _id }).exec();
 
     if (!playerExist) {
-      throw new NotFoundException(`Jogador com id ${_id} não encontrado!`);
+      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
     }
 
     return await this.playerModel
@@ -55,7 +55,7 @@ export class PlayersService {
     const player = await this.playerModel.findOne({ _id }).exec();
 
     if (!player) {
-      throw new NotFoundException(`Jogador com id ${_id} não encontrado!`);
+      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
     }
 
     return player;
@@ -65,7 +65,7 @@ export class PlayersService {
     const playerExist = await this.playerModel.findOne({ _id }).exec();
 
     if (!playerExist) {
-      throw new NotFoundException(`Jogador com id ${_id} não encontrado!`);
+      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
     }
 
     return await this.playerModel.remove({ _id }).exec();

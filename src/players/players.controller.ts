@@ -61,7 +61,7 @@ export class PlayersController {
   }
 
   @Get('/:_id')
-  async getPlayerById(
+  async getPlayer(
     @Param('_id', PlayersParamsValidationPipe) _id: string,
   ): Promise<string> {
     const player = await this.playersService.getPlayerById(_id);

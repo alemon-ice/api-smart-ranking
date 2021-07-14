@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 // import config, { IConfig } from 'config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PlayersModule } from './players/players.module';
+import { CategoriesModule } from './categories/categories.module';
 
 // const dbConfig: IConfig = config.get('App.database');
 
@@ -13,6 +14,7 @@ import { PlayersModule } from './players/players.module';
       useFindAndModify: false,
     }),
     PlayersModule,
+    CategoriesModule,
   ],
   controllers: [],
   providers: [],
