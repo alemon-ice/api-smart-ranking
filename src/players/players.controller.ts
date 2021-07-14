@@ -1,44 +1,82 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { CreatePlayerDto } from './dtos/create-player.dto';
+import { UpdatePlayerDto } from './dtos/update-player.tdo';
 import { PlayersService } from './players.service';
+import { PlayersParamsValidationPipe } from './pipes/players-params-validation.pipe';
 
 @Controller('api/v1/players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
   @Post()
-  async createOrUpdatePlayer(@Body() createPlayerDto: CreatePlayerDto) {
-    const playerResponse = await this.playersService.createOrUpdatePlayer(
+  @UsePipes(ValidationPipe)
+  async createPlayer(
+    @Body() createPlayerDto: CreatePlayerDto,
+  ): Promise<string> {
+    const playerResponse = await this.playersService.createPlayer(
       createPlayerDto,
     );
 
     return JSON.stringify({
-      message: 'Jogador salvo com sucesso',
+      message: 'Jogador criado com sucesso',
+      data: playerResponse,
+    });
+  }
+
+  @Put('/:_id')
+  @UsePipes(ValidationPipe)
+  async updatePlayer(
+    @Param('_id', PlayersParamsValidationPipe) _id: string,
+    @Body() updatePlayerDto: UpdatePlayerDto,
+  ): Promise<string> {
+    const playerResponse = await this.playersService.updatePlayer(
+      _id,
+      updatePlayerDto,
+    );
+
+    return JSON.stringify({
+      message: 'Jogador atualizado com sucesso',
       data: playerResponse,
     });
   }
 
   @Get()
-  async getPlayers(@Query('email') email: string) {
-    const response = {
-      message: '',
-      data: null,
-    };
+  async getPlayers(): Promise<string> {
+    const players = await this.playersService.getAllPlayers();
 
-    if (email) {
-      response.message = 'Jogador encontrado com sucesso';
-      response.data = await this.playersService.getPlayerByEmail(email);
-    } else {
-      response.message = 'Jogadores listados com sucesso';
-      response.data = await this.playersService.getAllPlayers();
-    }
-
-    return JSON.stringify(response);
+    return JSON.stringify({
+      message: 'Jogadores listados com sucesso',
+      data: players,
+    });
   }
 
-  @Delete()
-  async deletePlayer(@Query('email') email: string) {
-    const player = await this.playersService.deletePlayer(email);
+  @Get('/:_id')
+  async getPlayerById(
+    @Param('_id', PlayersParamsValidationPipe) _id: string,
+  ): Promise<string> {
+    const player = await this.playersService.getPlayerById(_id);
+
+    return JSON.stringify({
+      message: 'Jogador encontrado com sucesso',
+      data: player,
+    });
+  }
+
+  @Delete('/:_id')
+  async deletePlayer(
+    @Param('_id', PlayersParamsValidationPipe) _id: string,
+  ): Promise<string> {
+    const player = await this.playersService.deletePlayer(_id);
 
     return JSON.stringify({
       message: 'Jogador deletado com sucesso',
