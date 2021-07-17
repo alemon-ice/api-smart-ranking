@@ -64,7 +64,7 @@ export class PlayersController {
   async getPlayer(
     @Param('_id', ParamsValidationPipe) _id: string,
   ): Promise<string> {
-    const player = await this.playersService.getPlayerById(_id);
+    const player = await this.playersService.findPlayerById(_id);
 
     return JSON.stringify({
       message: 'Jogador encontrado com sucesso',

@@ -33,11 +33,7 @@ export class PlayersService {
     _id: string,
     updatePlayerDto: UpdatePlayerDto,
   ): Promise<Player> {
-    const playerExist = await this.playerModel.findOne({ _id }).exec();
-
-    if (!playerExist) {
-      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
-    }
+    await this.findPlayerById(_id);
 
     return await this.playerModel
       .findOneAndUpdate({ _id }, { $set: updatePlayerDto })
@@ -48,7 +44,7 @@ export class PlayersService {
     return await this.playerModel.find().exec();
   }
 
-  async getPlayerById(_id: string): Promise<Player> {
+  async findPlayerById(_id: string): Promise<Player> {
     const player = await this.playerModel.findOne({ _id }).exec();
 
     if (!player) {
@@ -59,11 +55,7 @@ export class PlayersService {
   }
 
   async deletePlayer(_id: string): Promise<void> {
-    const playerExist = await this.playerModel.findOne({ _id }).exec();
-
-    if (!playerExist) {
-      throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
-    }
+    await this.findPlayerById(_id);
 
     await this.playerModel.deleteOne({ _id }).exec();
   }

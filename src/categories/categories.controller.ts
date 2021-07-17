@@ -44,7 +44,9 @@ export class CategoriesController {
 
   @Get('/:category')
   async getCategory(@Param('category', ParamsValidationPipe) category: string) {
-    const categoryDoc = await this.categoriesService.getCategory(category);
+    const categoryDoc = await this.categoriesService.findCategoryByName(
+      category,
+    );
 
     return JSON.stringify({
       message: 'Jogador encontrado com sucesso',

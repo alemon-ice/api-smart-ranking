@@ -42,11 +42,7 @@ export class ChallengesService {
     }
 
     const getPlayerWithCategory = async (player: string) => {
-      const playerExist = await this.playersService.getPlayerById(player);
-
-      if (!playerExist) {
-        throw new NotFoundException(`Jogador informado não encontrado`);
-      }
+      const playerExist = await this.playersService.findPlayerById(player);
 
       const playerCategory = await this.categoriesService.getPlayerCategory(
         playerExist._id,
@@ -115,15 +111,21 @@ export class ChallengesService {
     });
   }
 
+  async findChallengeById(_id: string): Promise<Challenge> {
+    const challenge = await this.challengeModel.findOne({ _id }).exec();
+
+    if (!challenge) {
+      throw new NotFoundException(`Desafio com id ${_id} não encontrado`);
+    }
+
+    return challenge;
+  }
+
   async updateChallenge(
     _id: string,
     updateChallengeDto: UpdateChallengeDto,
   ): Promise<void> {
-    const challengeExist = await this.challengeModel.findOne({ _id }).exec();
-
-    if (!challengeExist) {
-      throw new NotFoundException(`Desafio com id ${_id} não foi encontrado`);
-    }
+    await this.findChallengeById(_id);
 
     await this.challengeModel
       .findOneAndUpdate({ _id }, { $set: updateChallengeDto })
@@ -131,11 +133,7 @@ export class ChallengesService {
   }
 
   async deleteChallenge(_id: string): Promise<void> {
-    const challengeExist = await this.challengeModel.findOne({ _id }).exec();
-
-    if (!challengeExist) {
-      throw new NotFoundException(`Desafio com id ${_id} não foi encontrado`);
-    }
+    await this.findChallengeById(_id);
 
     await this.challengeModel.deleteOne({ _id }).exec();
   }

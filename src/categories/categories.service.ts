@@ -39,7 +39,7 @@ export class CategoriesService {
     return await this.categoryModel.find().populate('players').exec();
   }
 
-  async getCategory(category: string): Promise<Category> {
+  async findCategoryByName(category: string): Promise<Category> {
     const categoryDoc = await this.categoryModel.findOne({ category }).exec();
 
     if (!categoryDoc) {
@@ -53,11 +53,7 @@ export class CategoriesService {
     category: string,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    const categoryExist = await this.categoryModel.findOne({ category }).exec();
-
-    if (!categoryExist) {
-      throw new NotFoundException(`Categoria ${category} não encontrado`);
-    }
+    await this.findCategoryByName(category);
 
     return await this.categoryModel
       .findOneAndUpdate({ category }, { $set: updateCategoryDto })
@@ -77,12 +73,8 @@ export class CategoriesService {
   ): Promise<void> {
     const { player, category } = assignPlayerToCategoryDto;
 
-    const categoryDoc = await this.categoryModel.findOne({ category });
-    const playerDoc = await this.playersService.getPlayerById(player);
-
-    if (!categoryDoc) {
-      throw new BadRequestException(`Categoria ${category} não encontrado`);
-    }
+    const categoryDoc = await this.findCategoryByName(category);
+    const playerDoc = await this.playersService.findPlayerById(player);
 
     const playerAlreadyRegistered = categoryDoc.players.find(
       (categoryPlayer) => {
@@ -113,11 +105,9 @@ export class CategoriesService {
   }
 
   async deleteCategory(category: string): Promise<void> {
-    const categoryExist = await this.categoryModel.findOne({ category }).exec();
+    const categoryExist = await this.findCategoryByName(category);
 
-    if (!categoryExist) {
-      throw new NotFoundException(`Categoria ${category} não encontrado`);
-    } else if (!!categoryExist.players.length) {
+    if (!!categoryExist.players.length) {
       throw new NotFoundException(
         `Uma categoria que contém jogadores registrados não pode ser excluída`,
       );
