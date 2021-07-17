@@ -12,7 +12,7 @@ import {
 import { CreatePlayerDto } from './dtos/create-player.dto';
 import { UpdatePlayerDto } from './dtos/update-player.tdo';
 import { PlayersService } from './players.service';
-import { PlayersParamsValidationPipe } from './pipes/players-params-validation.pipe';
+import { ParamsValidationPipe } from '../common/pipes/params-validation.pipe';
 
 @Controller('api/v1/players')
 export class PlayersController {
@@ -36,7 +36,7 @@ export class PlayersController {
   @Put('/:_id')
   @UsePipes(ValidationPipe)
   async updatePlayer(
-    @Param('_id', PlayersParamsValidationPipe) _id: string,
+    @Param('_id', ParamsValidationPipe) _id: string,
     @Body() updatePlayerDto: UpdatePlayerDto,
   ): Promise<string> {
     const playerResponse = await this.playersService.updatePlayer(
@@ -62,7 +62,7 @@ export class PlayersController {
 
   @Get('/:_id')
   async getPlayer(
-    @Param('_id', PlayersParamsValidationPipe) _id: string,
+    @Param('_id', ParamsValidationPipe) _id: string,
   ): Promise<string> {
     const player = await this.playersService.getPlayerById(_id);
 
@@ -74,13 +74,12 @@ export class PlayersController {
 
   @Delete('/:_id')
   async deletePlayer(
-    @Param('_id', PlayersParamsValidationPipe) _id: string,
+    @Param('_id', ParamsValidationPipe) _id: string,
   ): Promise<string> {
-    const player = await this.playersService.deletePlayer(_id);
+    await this.playersService.deletePlayer(_id);
 
     return JSON.stringify({
       message: 'Jogador deletado com sucesso',
-      data: player,
     });
   }
 }

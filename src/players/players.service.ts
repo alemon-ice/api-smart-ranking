@@ -61,13 +61,13 @@ export class PlayersService {
     return player;
   }
 
-  async deletePlayer(_id: string): Promise<Player> {
+  async deletePlayer(_id: string): Promise<void> {
     const playerExist = await this.playerModel.findOne({ _id }).exec();
 
     if (!playerExist) {
       throw new NotFoundException(`Jogador com id ${_id} não encontrado`);
     }
 
-    return await this.playerModel.remove({ _id }).exec();
+    await this.playerModel.deleteOne({ _id }).exec();
   }
 }
