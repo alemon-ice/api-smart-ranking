@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Player } from 'src/players/interfaces/player.interface';
 import { PlayersService } from 'src/players/players.service';
 import { AssignPlayerToCategoryDto } from './dtos/assign-player-to-category.dto';
 import { CreateCategoryDto } from './dtos/create-category.dto';
@@ -63,6 +64,14 @@ export class CategoriesService {
       .exec();
   }
 
+  async getPlayerCategory(player: Player): Promise<Category> {
+    return await this.categoryModel
+      .findOne()
+      .where('players')
+      .in(player._id)
+      .exec();
+  }
+
   async assignPlayerToCategory(
     assignPlayerToCategoryDto: AssignPlayerToCategoryDto,
   ): Promise<void> {
@@ -85,13 +94,7 @@ export class CategoriesService {
       throw new BadRequestException(`Jogador já registrado nesta categoria`);
     }
 
-    const oldPlayerCategory = await this.categoryModel
-      .findOne()
-      .where('players')
-      .in(playerDoc._id)
-      .exec();
-    console.log({ id: playerDoc._id });
-    console.log({ oldPlayerCategory });
+    const oldPlayerCategory = await this.getPlayerCategory(playerDoc);
 
     if (oldPlayerCategory) {
       oldPlayerCategory.players = oldPlayerCategory.players.filter(

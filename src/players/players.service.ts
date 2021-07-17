@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,8 +11,6 @@ import { Player } from './interfaces/player.interface';
 
 @Injectable()
 export class PlayersService {
-  private readonly logger = new Logger(PlayersService.name);
-
   constructor(
     @InjectModel('Player') private readonly playerModel: Model<Player>,
   ) {}
