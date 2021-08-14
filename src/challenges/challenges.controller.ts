@@ -11,6 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
+import { AssignChallengeToMatchDto } from './dtos/assign-challenge-to-match.dto';
 import { CreateChallengeDto } from './dtos/create-challenge.dto';
 import { UpdateChallengeDto } from './dtos/update-challenge.dto';
 
@@ -63,6 +64,22 @@ export class ChallengesController {
 
     return JSON.stringify({
       message: 'Desafio deletado com sucesso',
+    });
+  }
+
+  @Post('/:_id/assign-match')
+  @UsePipes(ValidationPipe)
+  async assignChallengeToMatch(
+    @Body() assignChallengeToMatchDto: AssignChallengeToMatchDto,
+    @Param('_id') _id: string,
+  ): Promise<string> {
+    await this.challengesService.assignChallengeToMatch(
+      _id,
+      assignChallengeToMatchDto,
+    );
+
+    return JSON.stringify({
+      message: 'Desafio atribuído à partida com sucesso!',
     });
   }
 }

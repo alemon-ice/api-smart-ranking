@@ -1,7 +1,9 @@
 import { Document } from 'mongoose';
 import { Player } from 'src/players/interfaces/player.interface';
 
-export const ChallengeStatusValues = {
+export const ChallengeStatusValues: {
+  [key: string]: ChallengeStatusEnumValues;
+} = {
   DONE: 'DONE',
   PENDING: 'PENDING',
   ACCEPTED: 'ACCEPTED',
@@ -9,7 +11,7 @@ export const ChallengeStatusValues = {
   CANCELED: 'CANCELED',
 };
 
-export enum ChallengeStatusEnum {
+enum ChallengeStatusEnum {
   DONE,
   PENDING,
   ACCEPTED,
@@ -17,9 +19,11 @@ export enum ChallengeStatusEnum {
   CANCELED,
 }
 
+export type ChallengeStatusEnumValues = keyof typeof ChallengeStatusEnum;
+
 export interface Challenge extends Document {
   datetimeChallenge: Date;
-  status: ChallengeStatusEnum;
+  status: ChallengeStatusEnumValues;
   datetimeRequest: Date;
   datetimeResponse: Date;
   challenger: Player;

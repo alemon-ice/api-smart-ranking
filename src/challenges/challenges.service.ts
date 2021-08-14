@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,17 +12,20 @@ import { CreateChallengeDto } from './dtos/create-challenge.dto';
 import {
   Challenge,
   ChallengeStatusValues,
+  Match,
 } from './interfaces/challenge.interface';
 import { isPast } from 'date-fns';
 import { Player } from 'src/players/interfaces/player.interface';
 import { Category } from 'src/categories/interface/category.interface';
 import { sub } from 'date-fns';
 import { UpdateChallengeDto } from './dtos/update-challenge.dto';
+import { AssignChallengeToMatchDto } from './dtos/assign-challenge-to-match.dto';
 
 @Injectable()
 export class ChallengesService {
   constructor(
     @InjectModel('Challenge') private readonly challengeModel: Model<Challenge>,
+    @InjectModel('Match') private readonly matchModel: Model<Match>,
     private readonly playersService: PlayersService,
     private readonly categoriesService: CategoriesService,
   ) {}
@@ -80,7 +84,7 @@ export class ChallengesService {
       ...createChallengeDto,
       category: challengerCategory.category,
       datetimeRequest: new Date(),
-      status: ChallengeStatusValues.DONE,
+      status: ChallengeStatusValues.PENDING,
     });
 
     return await challengeCreate.save();
@@ -136,5 +140,41 @@ export class ChallengesService {
     await this.findChallengeById(_id);
 
     await this.challengeModel.deleteOne({ _id }).exec();
+  }
+
+  async assignChallengeToMatch(
+    _id: string,
+    assignChallengeToMatchDto: AssignChallengeToMatchDto,
+  ): Promise<void> {
+    const challenge = await this.findChallengeById(_id);
+
+    const defPlayer = challenge.players.find(
+      (player) =>
+        player.toString() === assignChallengeToMatchDto.def.toString(),
+    );
+
+    if (!defPlayer) {
+      throw new BadRequestException(`Vencedor não faz parte do Desafio`);
+    }
+
+    const matchCreate = new this.matchModel(assignChallengeToMatchDto);
+
+    matchCreate.category = challenge.category;
+    matchCreate.players = challenge.players;
+
+    const match = await matchCreate.save();
+
+    challenge.status = ChallengeStatusValues.DONE;
+    challenge.match = match._id;
+
+    try {
+      await this.challengeModel
+        .findOneAndUpdate({ _id }, { $set: challenge })
+        .exec();
+    } catch (err) {
+      await this.matchModel.deleteOne({ _id: match._id }).exec();
+
+      throw new InternalServerErrorException();
+    }
   }
 }

@@ -1,12 +1,15 @@
 import { IsEnum, IsDateString, IsNotEmpty } from 'class-validator';
-import { ChallengeStatusEnum } from '../interfaces/challenge.interface';
+import {
+  ChallengeStatusValues,
+  ChallengeStatusEnumValues,
+} from '../interfaces/challenge.interface';
 
 export class UpdateChallengeDto {
   @IsNotEmpty()
   @IsDateString()
   datetimeChallenge: Date;
 
-  @IsEnum(ChallengeStatusEnum)
+  @IsEnum(ChallengeStatusValues)
   @IsNotEmpty()
-  status: ChallengeStatusEnum;
+  status: ChallengeStatusEnumValues;
 }
